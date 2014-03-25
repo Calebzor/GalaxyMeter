@@ -2,7 +2,7 @@
 -- Client Lua Script for GalaxyMeter
 -- Copyright (c) NCsoft. All rights reserved
 -----------------------------------------------------------------------------------------------
- 
+
 require "Apollo"
 require "ChatSystemLib"
 require "GameLib"
@@ -65,7 +65,7 @@ local GalaxyMeter = {
 
 local gLog
 local Queue
- 
+
 -----------------------------------------------------------------------------------------------
 -- Constants
 -----------------------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ function GalaxyMeter:OnLoad()
 
 		return qNew
 	end
-	
+
 	-- Slash Commands
 	Apollo.RegisterSlashCommand("galaxy", 							"OnGalaxyMeterOn", self)
 	Apollo.RegisterSlashCommand("lkm", 								"OnGalaxyMeterOn", self)
@@ -498,7 +498,7 @@ end
 -- Timers
 -----------------------------------------------------------------------------------------------
 function GalaxyMeter:OnPulse()
-	
+
 	local unitPlayer = GameLib.GetPlayerUnit()
 	if unitPlayer then
 		self.unitPlayer = GameLib.GetPlayerUnit()
@@ -627,7 +627,7 @@ function GalaxyMeter:GroupInCombat()
 	for i = 1, nMemberCount do
 		local tUnit = GroupLib.GetUnitForGroupMember(i)
 
-		if tUnit and tUnit:IsInCombat() or (bSelfInCombat and tUnit:IsDead()) then
+		if tUnit and (tUnit:IsInCombat() or (bSelfInCombat and tUnit:IsDead())) then
 			bCombat = true
 			break
 		end
@@ -638,11 +638,11 @@ function GalaxyMeter:GroupInCombat()
 	if not bCombat then
 		self.bNeedNewLog = true
 	end
-	
+
 	return bCombat
 end
 
-	
+
 function GalaxyMeter:StartLogSegment()
 
 	gLog:info("StartLogSegment()")
@@ -749,7 +749,7 @@ end
 -- GalaxyMeter OnEnteredCombat
 -----------------------------------------------------------------------------------------------
 function GalaxyMeter:OnEnteredCombat(unit, bInCombat)
-	
+
 	if unit:GetId() == GameLib.GetPlayerUnit():GetId() then
 
 		-- We weren't in combat before, so start new segment
@@ -2403,7 +2403,7 @@ function GalaxyMeter:DisplayList(Listing)
 		wnd.right_text:SetText(v.tStr)
 		wnd.bar:SetProgress(v.progress)
 	end
-	
+
 	-- Trim Remainder
 	if #self.tItems > #Listing then
 		for i = #Listing + 1, #self.tItems do
@@ -2411,7 +2411,7 @@ function GalaxyMeter:DisplayList(Listing)
 			self.tItems[i] = nil
 		end
 	end
-	
+
 	-- Rearrange if list order changed
 	if Arrange then
 		self.wndItemList:ArrangeChildrenVert()
@@ -2504,14 +2504,14 @@ end
 function GalaxyMeter:OnEncounterDropDown( wndHandler, wndControl, eMouseButton )
 	if not self.wndEncList:IsVisible() then
 		self.wndEncList:Show(true)
-		
+
 		-- Newest Entry at the Top
 		for i = 1, #self.log do
 			local wnd = Apollo.LoadForm(self.xmlMainDoc, "EncounterItem", self.Children.EncItemList, self)
 			table.insert(self.tEncItems, wnd)
-			
+
 			local TimeString = self:SecondsToString(self.log[i].combat_length)
-			
+
 			wnd:FindChild("Text"):SetText(self.log[i].name .. " - " .. TimeString)
 			wnd:FindChild("Highlight"):Show(false)
 			wnd:SetData(i)
@@ -2737,7 +2737,7 @@ end
 function GalaxyMeter:AddItem(i)
 	-- load the window item for the list item
 	local wnd = Apollo.LoadForm(self.xmlMainDoc, "ListItem", self.wndItemList, self)
-	
+
 	-- keep track of the window item created
 	self.tItems[i] = { wnd = wnd }
 
@@ -2755,7 +2755,7 @@ function GalaxyMeter:AddItem(i)
 	wnd:FindChild("Highlight"):Show(false)
 
 	wnd:SetData(i)
-	
+
 	return self.tItems[i]
 end
 
@@ -2825,10 +2825,10 @@ function GalaxyMeter:OnSave(eType)
 		--end
 
 		tSave.bActive = self.wndMain:IsVisible()
-		
+
 	elseif eType == GameLib.CodeEnumAddonSaveLevel.Character then
 	end
-	
+
 	return tSave
 end
 
@@ -2874,7 +2874,7 @@ function GalaxyMeter:OnEncounterItemSelected( wndHandler, wndControl, eMouseButt
 	self.vars.tModeLast = {}
 
 	self.Children.EncounterText:SetText(self.vars.tLogDisplay.name)
-	
+
 	self:HideEncounterDropDown()
 
 	-- Right now this only updates in OnTimer, should probably look at the bDirty logic and move it into RefreshDisplay
